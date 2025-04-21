@@ -1,10 +1,4 @@
-with customers as (
-    select
-    customer_id
-    from {{ ref('stg_jaffle_shop__customers') }}
-),
-
-orders as (
+with orders as (
     select 
     order_id,
     customer_id
@@ -12,23 +6,25 @@ orders as (
 
 ),
 
-payments as
+payments as (
+    select * from {{ ref('stg_stripe__payments') }}
+),
+
+order_payments as
 (
     select 
     order_id,
-    amount
-     FROM {{ ref('stg_stripe__payments') }}
+    sum(case when status = 'success' then amount end) as amount
+    from payments 
+    group by 1
 
 )
 
 select 
-o.order_id,
-c.customer_id,
-p.amount 
+orders.order_id,
+orders.customer_id,
+order_payments.amount 
 from
-customers c 
-left join orders o 
-on c.customer_id = o.customer_id
-left join payments p 
-on o.order_id = p.order_id
+orders 
+left join order_payments using (order_id)
 

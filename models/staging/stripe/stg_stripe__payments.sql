@@ -3,7 +3,7 @@ select
     id as payment_id,
     paymentmethod as payment_method,
     status,
-    amount,
+    amount/100 as amount,
     created as order_date
 
 from `dbt-tutorial`.stripe.payment
