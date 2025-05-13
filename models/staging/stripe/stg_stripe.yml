@@ -1,0 +1,15 @@
+version: 2
+
+models: 
+  - name: stg_stripe__payments
+    description: Staged data for payment method and amount for Jaffle shop app
+    columns:
+      - name: payment_id
+        description: The primary key for payments
+      - name: payment_method
+        description: "{{doc('payment_method')}}"
+      - name: order_id
+        tests:
+          - relationships:
+              to: ref('stg_jaffle_shop__orders')
+              field: order_id
